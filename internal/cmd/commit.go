@@ -8,7 +8,6 @@ import (
 
 	"github.com/doganarif/giq/internal/ai"
 	"github.com/doganarif/giq/internal/app"
-	"github.com/go-git/go-git/v5"
 	"github.com/spf13/cobra"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -71,7 +70,7 @@ func (m fallbackModel) View() string {
 }
 
 // handleUnconfiguredAPI presents options to the user when API is not configured
-func handleUnconfiguredAPI() (string, error) {
+func handleUnconfiguredAPI(a *app.App) (string, error) {
 	p := tea.NewProgram(initialFallbackModel())
 	m, err := p.Run()
 	if err != nil {
@@ -95,7 +94,12 @@ func handleUnconfiguredAPI() (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return strings.TrimSpace(message), nil
+		// Use system git for commit to ensure signing config is respected
+		message = strings.TrimSpace(message)
+		if err := a.ExecGit("commit", "-m", message); err != nil {
+			return "", err
+		}
+		return "", nil
 	} else {
 		// Run setup
 		if _, err := RunSetup(); err != nil {
@@ -165,7 +169,7 @@ func NewCommitCommand(a *app.App) *cobra.Command {
 		Use:   "commit",
 		Short: "Create a commit with an AI-generated message from staged changes",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// If message flag is provided, use it directly
+			// If message flag is provided, use it directly with system git
 			if message != "" {
 				return a.ExecGit("commit", "-m", message)
 			}
@@ -199,20 +203,8 @@ func NewCommitCommand(a *app.App) *cobra.Command {
 			if err != nil {
 				// Handle unconfigured API case
 				if strings.Contains(err.Error(), "API key is not configured") {
-					message, err := handleUnconfiguredAPI()
-					if err != nil {
-						return err
-					}
-					if message != "" {
-						// Commit with the custom message
-						w, err := a.Repo.Worktree()
-						if err != nil {
-							return err
-						}
-						_, err = w.Commit(message, &git.CommitOptions{})
-						return err
-					}
-					return nil // Setup completed, user should try again
+					_, err := handleUnconfiguredAPI(a)
+					return err
 				}
 				return err
 			}
@@ -249,13 +241,7 @@ func NewCommitCommand(a *app.App) *cobra.Command {
 				commitMsg = strings.TrimSpace(customMsg)
 			}
 
-			// Create the commit
-			w, err := a.Repo.Worktree()
-			if err != nil {
-				return err
-			}
-			_, err = w.Commit(commitMsg, &git.CommitOptions{})
-			return err
+			return a.ExecGit("commit", "-m", commitMsg)
 		},
 	}
 
