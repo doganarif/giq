@@ -14,6 +14,7 @@ import (
 // It calls GenerateCommitMessages and returns the first suggestion.
 func GenerateCommitMessage(cfg *config.Config, prompt string) (string, error) {
 	suggestions, err := GenerateCommitMessages(cfg, prompt)
+	fmt.Println(prompt)
 	if err != nil {
 		return "", err
 	}
