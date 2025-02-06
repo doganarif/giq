@@ -12,11 +12,6 @@ builds:
       - amd64
       - arm64
     binary: giq
-    hooks:
-      post: rice append --exec "{{ .Path }}"
-    ignore:
-      - goos: windows
-        goarch: arm64
     mod_timestamp: '{{ .CommitTimestamp }}'
     flags:
       - -trimpath
@@ -26,26 +21,22 @@ builds:
       - -X main.commit={{.Commit}}
       - -X main.date={{.Date}}
 
-universal_binaries:
-  - replace: true
-    name_template: "giq"
-
 archives:
   - format: tar.gz
     name_template: >-
-      {{ .ProjectName }}_{{ .Version }}_
+      {{ .ProjectName }}_
       {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
+      {{- if eq .Arch "amd64" }}amd64
       {{- else }}{{ .Arch }}{{ end }}
-    format_overrides:
-      - goos: windows
-        format: zip
     files:
       - README.md
       - LICENSE*
 
 checksum:
   name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
@@ -61,13 +52,15 @@ brews:
     tap:
       owner: doganarif
       name: homebrew-giq
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    folder: Formula
     homepage: "https://github.com/doganarif/giq"
     description: "Git wrapper enhanced with AI-powered features"
     license: "MIT"
-    test: |
-      system "#{bin}/giq --version"
+    dependencies:
+      - name: git
     install: |
       bin.install "giq"
+    test: |
+      system "#{bin}/giq", "--version"
+    service: {}
