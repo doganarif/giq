@@ -2,6 +2,8 @@
 
 giq is a Git wrapper that enhances your Git workflow with AI-powered features. It provides intelligent commit message suggestions and status insights while maintaining full compatibility with standard Git commands.
 
+![demo](https://raw.githubusercontent.com/doganarif/giq/main/demo/demo.gif)
+
 ## Features
 
 - **AI-Powered Commit Messages**: Automatically generates contextual commit messages based on your staged changes
