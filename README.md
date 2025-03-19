@@ -1,3 +1,5 @@
+<a href="https://syntaks.ai" target="_blank"><img src="https://img.shields.io/badge/syntaks.ai-AI%20MVPs%20in%204%20Weeks-f39c12?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEyIDJsMyAxMC0xMCA5eiIgZmlsbD0iIzAwZmY5ZCIvPjwvc3ZnPg==" alt="syntaks.ai - AI MVPs in 4 Weeks"></a>
+
 # giq (Git Intelligence Quickstart)
 
 giq is a Git wrapper that enhances your Git workflow with AI-powered features. It provides intelligent commit message suggestions and status insights while maintaining full compatibility with standard Git commands.
